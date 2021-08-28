@@ -1,0 +1,59 @@
+README
+
+add APK to git repo
+
+launcher icon
+
+button to refresh stream???
+
+pin to zoom, pan horizontal
+
+on page change, beach name text overlay 3 secs
+
+I think I am better off not using compose and copying from real example
+
+compose but with viewpager functionality within AndroidView
+
+next task viewpager demo
+
+exoplayer need to follow switch surface demo
+
+I think i should come back to this once I have more experience
+
+or try to find real example compose exoplayer
+compose recyclerview
+
+google ViewPager exoplayer
+
+read accompiast docs
+
+remove hilt if not needed
+
+button refresh video to live stream
+
+simple task: exoplayer in compose viewmodel
+
+exoplayer docs
+
+https://stackoverflow.com/search?tab=votes&q=androidview%20compose
+
+https://stackoverflow.com/search?tab=newest&q=%5bexoplayer%5d%20answers%3a1..
+
+https://gist.github.com/shkcodes/f675612063d92cf48d17623a1b01c92e
+
+https://proandroiddev.com/using-exoplayer-in-lazycolumn-65c47e0ceed5
+
+read compose docs AndroidView
+...
+
+run composecookbook tiktok example
+google exoplayer compose
+use sandbox activity to play with code
+
+cull trello boards
+
+[
+  "https://cams.cdn-surfline.com/cdn-au/au-lennoxhead/playlist.m3u8"
+  "https://cams.cdn-surfline.com/cdn-au/au-ballinashellybeach/playlist.m3u8"
+  "https://cams.cdn-surfline.com/cdn-au/au-ballinalighthouse/chunklist.m3u8" 
+]
