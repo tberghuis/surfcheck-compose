@@ -1,3 +1,11 @@
+single beach zoom
+nav drawer
+  - remember position
+
+web app generate apk from beach list template ejs...
+
+#####################################
+
 README
 
 add APK to git repo
