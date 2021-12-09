@@ -1,61 +1,136 @@
 package xyz.tberghuis.surfcheckcompose.ui
 
-import android.util.Log
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.VerticalPager
-import com.google.accompanist.pager.rememberPagerState
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.MimeTypes
-import kotlin.math.absoluteValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import xyz.tberghuis.surfcheckcompose.data.camArray
 
-@OptIn(ExperimentalPagerApi::class)
+
 @Composable
 fun SurfcamScreen() {
-  val urls = arrayOf(
-    "https://cams.cdn-surfline.com/cdn-au/au-byronbay/playlist.m3u8",
-    "https://cams.cdn-surfline.com/cdn-au/au-thepassoverview/playlist.m3u8",
-    "https://cams.cdn-surfline.com/cdn-au/au-lennoxhead/playlist.m3u8",
-    "https://cams.cdn-surfline.com/cdn-au/au-ballinashellybeach/playlist.m3u8",
-    "https://cams.cdn-surfline.com/cdn-au/au-ballinalighthouse/chunklist.m3u8",
-    "https://cams.cdn-surfline.com/cdn-au/au-evanshead/playlist.m3u8"
-  )
-  val pagerState = rememberPagerState(pageCount = urls.size)
-  VerticalPager(state = pagerState) { page ->
-    val pageDelta = page - currentPage
-    Log.d("xxx", "page $page currentPage $currentPage")
-    Box(modifier = Modifier.fillMaxSize()) {
-      if (pageDelta.absoluteValue > 1) {
-        // should be offscreen
-        Text(urls[page])
-      } else {
-        SurfcamPlayer(urls[page], page)
+
+  val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+
+  val scope = rememberCoroutineScope()
+
+  Scaffold(
+    scaffoldState = scaffoldState,
+    floatingActionButtonPosition = FabPosition.End,
+    floatingActionButton = {
+      FloatingActionButton(onClick = {
+        scope.launch {
+          scaffoldState.drawerState.open()
+        }
+      }) {
+        Text("X")
       }
+    },
+
+    drawerContent = { DrawerContent(scaffoldState, scope) },
+    content = {
+
+      SurfcamContent()
     }
-//    LaunchedEffect(pagerState) {
-//      snapshotFlow { pagerState.currentPage }.collect { page ->
-//        // Selected page has changed...
-//        //todo
-//      }
-//    }
-  }
+
+  )
 }
 
-
 @Composable
-fun SurfcamPlayer(url: String, page: Int) {
+fun DrawerContent(scaffoldState: ScaffoldState, scope: CoroutineScope) {
 
   val surfcamViewModel = viewModel<SurfcamViewModel>()
 
-  AndroidView(factory = {
-    val playerInit = surfcamViewModel.initializePlayer(it, page).also { exoPlayer ->
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .verticalScroll(rememberScrollState()),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+//    Text("the wreck")
+    Spacer(modifier = Modifier.padding(20.dp))
+    camArray.forEachIndexed { i, cam ->
+      Text(
+        cam.name, modifier = Modifier
+          .padding(10.dp)
+          .clickable {
+            surfcamViewModel.currentCamIndexState.value = i
+            scope.launch {
+              scaffoldState.drawerState.close()
+            }
+          },
+        fontSize = 20.sp
+
+      )
+      Spacer(modifier = Modifier.padding(20.dp))
+    }
+
+  }
+}
+
+@Composable
+fun SurfcamContent() {
+  var offset by remember { mutableStateOf(Offset.Zero) }
+  var zoom by remember { mutableStateOf(1f) }
+
+
+  Column(
+    Modifier
+      .background(Color(0xFFEDEAE0))
+      .fillMaxSize()
+      .pointerInput(Unit) {
+        detectTransformGestures(
+          onGesture = { _, pan, gestureZoom, _ ->
+            zoom *= gestureZoom
+            offset += pan
+          }
+        )
+      },
+    verticalArrangement = Arrangement.Center
+  ) {
+
+
+    val modifier = Modifier
+
+      .graphicsLayer {
+        translationX = offset.x
+        translationY = offset.y
+        scaleX = zoom
+        scaleY = zoom
+      }
+
+    VideoContainer(modifier)
+  }
+
+
+}
+
+@Composable
+fun VideoContainer(modifier: Modifier) {
+  val surfcamViewModel = viewModel<SurfcamViewModel>()
+  val url = camArray[surfcamViewModel.currentCamIndexState.value].url
+
+  AndroidView(modifier = modifier, factory = {
+    val playerInit = surfcamViewModel.initializePlayer(it).also { exoPlayer ->
       val mediaItem = MediaItem.Builder()
         .setUri(url)
         .setMimeType(MimeTypes.APPLICATION_M3U8)
@@ -69,5 +144,13 @@ fun SurfcamPlayer(url: String, page: Int) {
       player = playerInit
 //      resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
     }
-  })
+  },
+    update = {
+      val mediaItem = MediaItem.Builder()
+        .setUri(url)
+        .setMimeType(MimeTypes.APPLICATION_M3U8)
+        .build()
+      it.player?.setMediaItem(mediaItem)
+    })
 }
+

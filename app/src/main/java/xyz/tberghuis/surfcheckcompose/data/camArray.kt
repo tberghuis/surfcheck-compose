@@ -1,4 +1,4 @@
-package xyz.tberghuis.surfcheckcompose.tmp
+package xyz.tberghuis.surfcheckcompose.data
 
 data class Cam(
   val name: String,
