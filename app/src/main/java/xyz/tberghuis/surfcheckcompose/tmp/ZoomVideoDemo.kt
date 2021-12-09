@@ -62,15 +62,16 @@ fun ZoomVideoDemo() {
         scaleY = zoom
       }
 
-    VideoContainer(camArray[0].url, modifier)
+    VideoContainer(modifier)
   }
 
 
 }
 
 @Composable
-fun VideoContainer(url: String, modifier: Modifier) {
+fun VideoContainer(modifier: Modifier) {
   val playerViewModel = viewModel<PlayerViewModel>()
+  val url = camArray[playerViewModel.currentCamIndexState.value].url
 
   AndroidView(modifier = modifier, factory = {
     val playerInit = playerViewModel.initializePlayer(it).also { exoPlayer ->
@@ -87,13 +88,23 @@ fun VideoContainer(url: String, modifier: Modifier) {
       player = playerInit
 //      resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
     }
-  })
+  },
+    update = {
+      val mediaItem = MediaItem.Builder()
+        .setUri(url)
+        .setMimeType(MimeTypes.APPLICATION_M3U8)
+        .build()
+      it.player?.setMediaItem(mediaItem)
+    })
 }
 
 
 class PlayerViewModel : ViewModel() {
   // lateinit??? nah cause context may change???
   var player: SimpleExoPlayer? = null
+
+  val currentCamIndexState = mutableStateOf(0)
+
 
   fun initializePlayer(context: Context): SimpleExoPlayer {
     player = SimpleExoPlayer.Builder(context).build()
