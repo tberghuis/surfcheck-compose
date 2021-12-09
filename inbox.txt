@@ -1,6 +1,4 @@
-single beach zoom
-nav drawer
-  - remember position
+add GC beaches
 
 web app generate apk from beach list template ejs...
 
