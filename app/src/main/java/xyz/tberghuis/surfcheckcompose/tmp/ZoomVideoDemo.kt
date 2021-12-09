@@ -62,20 +62,20 @@ fun ZoomVideoDemo() {
         scaleY = zoom
       }
 
-    VideoContainer(modifier)
+    VideoContainer(camArray[0].url, modifier)
   }
 
 
 }
 
 @Composable
-fun VideoContainer(modifier: Modifier) {
+fun VideoContainer(url: String, modifier: Modifier) {
   val playerViewModel = viewModel<PlayerViewModel>()
 
   AndroidView(modifier = modifier, factory = {
     val playerInit = playerViewModel.initializePlayer(it).also { exoPlayer ->
       val mediaItem = MediaItem.Builder()
-        .setUri("https://cams.cdn-surfline.com/cdn-au/au-ballinalighthouse/chunklist.m3u8")
+        .setUri(url)
         .setMimeType(MimeTypes.APPLICATION_M3U8)
         .build()
       exoPlayer.setMediaItem(mediaItem)
