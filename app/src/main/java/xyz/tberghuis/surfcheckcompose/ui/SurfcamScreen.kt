@@ -154,15 +154,16 @@ fun VideoContainer(modifier: Modifier) {
         .build()
       // reinitialize player if null???
       it.player?.setMediaItem(mediaItem)
+      it.player?.prepare()
     })
 
   // I have no idea what i am doing
-  val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    onDispose {
-      surfcamViewModel.player?.release()
-    }
-  }
+//  val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+//  DisposableEffect(lifecycleOwner) {
+//    onDispose {
+//      surfcamViewModel.player?.release()
+//    }
+//  }
 
 }
 
