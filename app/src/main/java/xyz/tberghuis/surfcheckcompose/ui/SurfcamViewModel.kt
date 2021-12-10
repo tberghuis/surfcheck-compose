@@ -10,7 +10,8 @@ class SurfcamViewModel : ViewModel() {
   // lateinit??? nah cause context may change???
   var player: SimpleExoPlayer? = null
 
-  val currentCamIndexState = mutableStateOf(0)
+  // default to northwall
+  val currentCamIndexState = mutableStateOf(26)
 
 
   fun initializePlayer(context: Context): SimpleExoPlayer {
