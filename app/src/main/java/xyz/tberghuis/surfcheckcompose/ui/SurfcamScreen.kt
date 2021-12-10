@@ -14,9 +14,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.PlayerView
@@ -150,7 +152,17 @@ fun VideoContainer(modifier: Modifier) {
         .setUri(url)
         .setMimeType(MimeTypes.APPLICATION_M3U8)
         .build()
+      // reinitialize player if null???
       it.player?.setMediaItem(mediaItem)
     })
+
+  // I have no idea what i am doing
+  val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    onDispose {
+      surfcamViewModel.player?.release()
+    }
+  }
+
 }
 
