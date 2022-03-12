@@ -1,3 +1,8 @@
+404 message
+min zoom
+add burleigh cams
+
+##############
 add GC beaches
 
 web app generate apk from beach list template ejs...
@@ -58,8 +63,4 @@ use sandbox activity to play with code
 
 cull trello boards
 
-[
-  "https://cams.cdn-surfline.com/cdn-au/au-lennoxhead/playlist.m3u8"
-  "https://cams.cdn-surfline.com/cdn-au/au-ballinashellybeach/playlist.m3u8"
-  "https://cams.cdn-surfline.com/cdn-au/au-ballinalighthouse/chunklist.m3u8" 
-]
+release apk build github readme

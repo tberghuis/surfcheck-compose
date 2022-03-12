@@ -5,7 +5,6 @@ data class Cam(
   val url: String
 )
 
-
 val camArray = arrayOf<Cam>(
   Cam("seaway", "https://cams.cdn-surfline.com/cdn-au/au-seaway/playlist.m3u8"),
   Cam("seawayspit", "https://cams.cdn-surfline.com/cdn-au/au-seawayspit/playlist.m3u8"),
@@ -14,6 +13,11 @@ val camArray = arrayOf<Cam>(
   Cam("artreef", "https://cams.cdn-surfline.com/cdn-au/au-artreef/playlist.m3u8"),
   Cam("surfersparadise", "https://cams.cdn-surfline.com/cdn-au/au-surfersparadise/playlist.m3u8"),
   Cam("kurrawa", "https://cams.cdn-surfline.com/cdn-au/au-kurrawa/playlist.m3u8"),
+  Cam(
+    "burleighheads overview",
+    "https://cams.cdn-surfline.com/cdn-au/au-burleighheadsov/playlist.m3u8"
+  ),
+  Cam("burleighheads", "https://cams.cdn-surfline.com/cdn-au/au-burleighheads/playlist.m3u8"),
   Cam("palmbeachqld", "https://cams.cdn-surfline.com/cdn-au/au-palmbeachqld/playlist.m3u8"),
   Cam(
     "currumbinalleyoverview",
