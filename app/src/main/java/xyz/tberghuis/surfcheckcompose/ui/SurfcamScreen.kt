@@ -102,7 +102,8 @@ fun SurfcamContent() {
       .pointerInput(Unit) {
         detectTransformGestures(
           onGesture = { _, pan, gestureZoom, _ ->
-            zoom *= gestureZoom
+            val tmpZoom = zoom * gestureZoom
+            zoom = if (tmpZoom < 1) 1f else tmpZoom
             offset += pan
           }
         )

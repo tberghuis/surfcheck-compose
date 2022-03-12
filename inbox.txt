@@ -1,6 +1,5 @@
 404 message
-min zoom
-add burleigh cams
+update gradle
 
 ##############
 add GC beaches
