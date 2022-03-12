@@ -1,6 +1,10 @@
 404 message, improve to include beach name
 update gradle... later
 
+release apk,
+github readme apk download link
+test
+
 ##############
 add GC beaches
 
