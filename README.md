@@ -1,1 +1,1 @@
-apk download 
+apk download https://github.com/tberghuis/surfcheck-compose/raw/master/app/release/app-release.apk
