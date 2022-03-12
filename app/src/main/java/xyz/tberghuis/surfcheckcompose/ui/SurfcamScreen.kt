@@ -1,5 +1,6 @@
 package xyz.tberghuis.surfcheckcompose.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -14,26 +15,28 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.MimeTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import xyz.tberghuis.surfcheckcompose.data.camArray
 
-
 @Composable
 fun SurfcamScreen() {
-
   val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
-
   val scope = rememberCoroutineScope()
+  val showSnackbarPlaybackError: (PlaybackException) -> Unit = { error ->
+    scope.launch {
+      scaffoldState.snackbarHostState.showSnackbar(error.toString())
+    }
+  }
 
   Scaffold(
     scaffoldState = scaffoldState,
@@ -50,8 +53,7 @@ fun SurfcamScreen() {
 
     drawerContent = { DrawerContent(scaffoldState, scope) },
     content = {
-
-      SurfcamContent()
+      SurfcamContent(showSnackbarPlaybackError)
     }
 
   )
@@ -59,9 +61,7 @@ fun SurfcamScreen() {
 
 @Composable
 fun DrawerContent(scaffoldState: ScaffoldState, scope: CoroutineScope) {
-
   val surfcamViewModel = viewModel<SurfcamViewModel>()
-
   Column(
     modifier = Modifier
       .fillMaxWidth()
@@ -81,20 +81,16 @@ fun DrawerContent(scaffoldState: ScaffoldState, scope: CoroutineScope) {
             }
           },
         fontSize = 20.sp
-
       )
       Spacer(modifier = Modifier.padding(20.dp))
     }
-
   }
 }
 
 @Composable
-fun SurfcamContent() {
+fun SurfcamContent(showSnackbarPlaybackError: (PlaybackException) -> Unit) {
   var offset by remember { mutableStateOf(Offset.Zero) }
   var zoom by remember { mutableStateOf(1f) }
-
-
   Column(
     Modifier
       .background(Color(0xFFEDEAE0))
@@ -110,30 +106,33 @@ fun SurfcamContent() {
       },
     verticalArrangement = Arrangement.Center
   ) {
-
-
     val modifier = Modifier
-
       .graphicsLayer {
         translationX = offset.x
         translationY = offset.y
         scaleX = zoom
         scaleY = zoom
       }
-
-    VideoContainer(modifier)
+    VideoContainer(modifier, showSnackbarPlaybackError)
   }
-
-
 }
 
 @Composable
-fun VideoContainer(modifier: Modifier) {
+fun VideoContainer(modifier: Modifier, showSnackbarPlaybackError: (PlaybackException) -> Unit) {
   val surfcamViewModel = viewModel<SurfcamViewModel>()
   val url = camArray[surfcamViewModel.currentCamIndexState.value].url
 
   AndroidView(modifier = modifier, factory = {
     val playerInit = surfcamViewModel.initializePlayer(it).also { exoPlayer ->
+
+      exoPlayer.addListener(object : Player.Listener {
+        override fun onPlayerError(error: PlaybackException) {
+          super.onPlayerError(error)
+          showSnackbarPlaybackError(error)
+          Log.d("xxx", "PlaybackException $error")
+        }
+      })
+
       val mediaItem = MediaItem.Builder()
         .setUri(url)
         .setMimeType(MimeTypes.APPLICATION_M3U8)

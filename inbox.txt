@@ -1,5 +1,5 @@
-404 message
-update gradle
+404 message, improve to include beach name
+update gradle... later
 
 ##############
 add GC beaches
