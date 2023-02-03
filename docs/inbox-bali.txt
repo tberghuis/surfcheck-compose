@@ -1,0 +1,3 @@
+update dependency versions
+add bali cams
+restrict zoom and pan to edge
