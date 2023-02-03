@@ -21,3 +21,6 @@ local.properties
 /app/build/outputs/*
 !/app/build/outputs/apk/
 /app/build/outputs/apk/debug/
+
+
+/app/release
