@@ -22,7 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.MimeTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -38,8 +38,7 @@ fun SurfcamScreen() {
     }
   }
 
-  Scaffold(
-    scaffoldState = scaffoldState,
+  Scaffold(scaffoldState = scaffoldState,
     floatingActionButtonPosition = FabPosition.End,
     floatingActionButton = {
       FloatingActionButton(onClick = {
@@ -52,8 +51,8 @@ fun SurfcamScreen() {
     },
 
     drawerContent = { DrawerContent(scaffoldState, scope) },
-    content = {
-      SurfcamContent(showSnackbarPlaybackError)
+    content = { contentPadding ->
+      SurfcamContent(contentPadding, showSnackbarPlaybackError)
     }
 
   )
@@ -79,8 +78,7 @@ fun DrawerContent(scaffoldState: ScaffoldState, scope: CoroutineScope) {
             scope.launch {
               scaffoldState.drawerState.close()
             }
-          },
-        fontSize = 20.sp
+          }, fontSize = 20.sp
       )
       Spacer(modifier = Modifier.padding(20.dp))
     }
@@ -88,31 +86,30 @@ fun DrawerContent(scaffoldState: ScaffoldState, scope: CoroutineScope) {
 }
 
 @Composable
-fun SurfcamContent(showSnackbarPlaybackError: (PlaybackException) -> Unit) {
+fun SurfcamContent(
+  contentPadding: PaddingValues, showSnackbarPlaybackError: (PlaybackException) -> Unit
+) {
   var offset by remember { mutableStateOf(Offset.Zero) }
   var zoom by remember { mutableStateOf(1f) }
   Column(
     Modifier
+      .padding(contentPadding)
       .background(Color(0xFFEDEAE0))
       .fillMaxSize()
       .pointerInput(Unit) {
-        detectTransformGestures(
-          onGesture = { _, pan, gestureZoom, _ ->
-            val tmpZoom = zoom * gestureZoom
-            zoom = if (tmpZoom < 1) 1f else tmpZoom
-            offset += pan
-          }
-        )
-      },
-    verticalArrangement = Arrangement.Center
+        detectTransformGestures(onGesture = { _, pan, gestureZoom, _ ->
+          val tmpZoom = zoom * gestureZoom
+          zoom = if (tmpZoom < 1) 1f else tmpZoom
+          offset += pan
+        })
+      }, verticalArrangement = Arrangement.Center
   ) {
-    val modifier = Modifier
-      .graphicsLayer {
-        translationX = offset.x
-        translationY = offset.y
-        scaleX = zoom
-        scaleY = zoom
-      }
+    val modifier = Modifier.graphicsLayer {
+      translationX = offset.x
+      translationY = offset.y
+      scaleX = zoom
+      scaleY = zoom
+    }
     VideoContainer(modifier, showSnackbarPlaybackError)
   }
 }
@@ -133,29 +130,25 @@ fun VideoContainer(modifier: Modifier, showSnackbarPlaybackError: (PlaybackExcep
         }
       })
 
-      val mediaItem = MediaItem.Builder()
-        .setUri(url)
-        .setMimeType(MimeTypes.APPLICATION_M3U8)
-        .build()
+      val mediaItem =
+        MediaItem.Builder().setUri(url).setMimeType(MimeTypes.APPLICATION_M3U8).build()
       exoPlayer.setMediaItem(mediaItem)
       exoPlayer.playWhenReady = true
       exoPlayer.prepare()
     }
-    PlayerView(it).apply {
+
+
+    StyledPlayerView(it).apply {
       useController = false
       player = playerInit
 //      resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
     }
-  },
-    update = {
-      val mediaItem = MediaItem.Builder()
-        .setUri(url)
-        .setMimeType(MimeTypes.APPLICATION_M3U8)
-        .build()
-      // reinitialize player if null???
-      it.player?.setMediaItem(mediaItem)
-      it.player?.prepare()
-    })
+  }, update = {
+    val mediaItem = MediaItem.Builder().setUri(url).setMimeType(MimeTypes.APPLICATION_M3U8).build()
+    // reinitialize player if null???
+    it.player?.setMediaItem(mediaItem)
+    it.player?.prepare()
+  })
 
   // I have no idea what i am doing
 //  val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
