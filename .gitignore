@@ -16,11 +16,5 @@ local.properties
 
 /.idea/deploymentTargetDropDown.xml
 
-/app/build/*
-!/app/build/outputs/
-/app/build/outputs/*
-!/app/build/outputs/apk/
-/app/build/outputs/apk/debug/
-
-
+/app/build
 /app/release
